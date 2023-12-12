@@ -1,6 +1,6 @@
 <div align="center">
 
-# # Kalamazoo
+# Kalamazoo
 
 <img alt="logo" src="kalamazoo.jpg" width="500px" height="auto">
 
