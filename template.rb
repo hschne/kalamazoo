@@ -15,6 +15,10 @@ def add_dependencies
   # Deployment
   gem 'kamal'
 
+  # Utilities
+  gem 'lograge'
+  
+  # Development
   gem 'rubocop'
   gem 'rubocop-rails'
 end
