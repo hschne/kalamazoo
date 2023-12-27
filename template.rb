@@ -21,12 +21,39 @@ def add_dependencies
   # Development
   gem 'rubocop'
   gem 'rubocop-rails'
+
+  gem_group :development do
+    gem 'annotate'
+    gem 'erb-formatter'
+
+    gem 'rubocop'
+    gem 'rubocop-factory_bot'
+    gem 'rubocop-rails'
+    gem 'rubocop-rspec'
+  end
+
+  # Testing
+  gem_group :development, :test do
+    gem 'rspec-rails'
+    gem 'factory_bot_rails'
+  end
 end
 
 def post_dependencies
   after_bundle do
+    generate('litestack:install')
+
+    generate('annotate:install')
+
+    generate('rspec:install')
+    uncomment_lines 'rspec/rails_helper.rb', /Rails.root.glob/
+
     rails_command 'db:create'
     rails_command 'db:migrate'
+
+    # Let's do an initial cleanup
+    run 'rubocop -A'
+
     git :init
     git add: '.'
     git commit: %( -m 'Initial commit' )
