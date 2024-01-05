@@ -5,6 +5,7 @@ RAILS_REQUIREMENT = '~> 7.1.1'.freeze
 def apply_template!
   assert_minimum_rails_version
   add_dependencies
+  setup_templates
   post_dependencies
 end
 
@@ -17,42 +18,38 @@ def add_dependencies
 
   # Utilities
   gem 'lograge'
-  
-  # Development
-  gem 'rubocop'
-  gem 'rubocop-rails'
 
   gem_group :development do
     gem 'annotate'
     gem 'erb-formatter'
 
-    gem 'rubocop'
     gem 'rubocop-factory_bot'
-    gem 'rubocop-rails'
-    gem 'rubocop-rspec'
+    gem 'rubocop-rails-omakase'
   end
 
   # Testing
   gem_group :development, :test do
-    gem 'rspec-rails'
     gem 'factory_bot_rails'
   end
 end
 
+def setup_templates; end
+
 def post_dependencies
   after_bundle do
+    # Set up Litestack
     generate('litestack:install')
-
-    generate('annotate:install')
-
-    generate('rspec:install')
-    uncomment_lines 'rspec/rails_helper.rb', /Rails.root.glob/
 
     rails_command 'db:create'
     rails_command 'db:migrate'
 
+    generate('annotate:install')
+
+    # Initialize Kamal
+    run 'kamal init'
+
     # Let's do an initial cleanup
-    run 'rubocop -A'
+    run 'bin/rubocop -A'
 
     git :init
     git add: '.'
