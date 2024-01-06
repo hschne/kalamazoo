@@ -1,12 +1,25 @@
+# Inspired by Rails template
+#
+# See https://github.com/mattbrictson/rails-template
 require 'bundler'
 require 'json'
 RAILS_REQUIREMENT = '~> 7.1.1'.freeze
 
 def apply_template!
   assert_minimum_rails_version
+  add_template_repository_to_source_path
+
   add_dependencies
   setup_templates
   post_dependencies
+end
+
+def username
+  @username ||= 'hschne'
+end
+
+def hostname
+  @hostname ||= "#{app_const_base.downcase}.com"
 end
 
 def add_dependencies
@@ -17,14 +30,19 @@ def add_dependencies
   gem 'kamal'
 
   # Utilities
+  gem 'inline_svg'
   gem 'lograge'
+
+  # Monitoring
+  gem 'sentry-ruby'
+  gem 'sentry-rails'
 
   gem_group :development do
     gem 'annotate'
     gem 'erb-formatter'
 
     gem 'rubocop-factory_bot'
-    gem 'rubocop-rails-omakase'
+    gem 'rubocop-rails-omakase', require: false
   end
 
   # Testing
@@ -33,7 +51,23 @@ def add_dependencies
   end
 end
 
-def setup_templates; end
+def setup_templates
+  template '.rubocop.yml'
+
+  # Deployment
+  template 'config/deploy.yml', force: true
+  template 'github/deploy.yml', '.github/workflows/deploy.yml'
+
+  # Config & Initializers
+  template 'config/initializers/default_url_options.rb'
+  copy_file 'config/initializers/lograge.rb'
+  copy_file 'config/initializers/sentry.rb'
+
+  append_to_file '.gitignore', <<~IGNORE
+    # Ignore locally-installed gems.
+    /vendor/bundle
+  IGNORE
+end
 
 def post_dependencies
   after_bundle do
@@ -49,6 +83,7 @@ def post_dependencies
     run 'kamal init'
 
     # Let's do an initial cleanup
+    run 'bundle binstubs rubocop'
     run 'bin/rubocop -A'
 
     git :init
@@ -89,3 +124,5 @@ def assert_minimum_rails_version
            "You are using #{rails_version}. Continue anyway?"
   exit 1 if no?(prompt)
 end
+
+apply_template!
