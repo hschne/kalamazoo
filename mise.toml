@@ -1,0 +1,14 @@
+min_version = "2024.9.5"
+
+[env]
+PROJECT_NAME = "{{ config_root | basename }}"
+_.path = ["{{config_root}}/node_modules/.bin"]
+
+[tools]
+# Picked up from .ruby-version and .node-version
+
+[settings]
+experimental = true
+
+[hooks]
+postinstall = "npx corepack enable"

@@ -1,0 +1,9 @@
+plugins:
+  - standard-rails
+  - rubocop-minitest
+  - rubocop-performance
+
+ignore:
+  - 'worktrees/**/*'
+  - 'db/schema.rb'
+  - 'db/*_schema.rb'
